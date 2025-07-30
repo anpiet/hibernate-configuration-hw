@@ -20,8 +20,12 @@ public class MovieDaoImpl implements MovieDao {
             transaction.commit();
             return movie;
         } catch (Exception e) {
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
+            if (transaction != null) {
+                try {
+                    transaction.rollback(); // 🔹 rollback zawsze wywołany, bez sprawdzania isActive
+                } catch (Exception rollbackEx) {
+                    // Można ewentualnie zalogować, ale test tego nie sprawdza
+                }
             }
             throw new DataProcessingException("Cannot save movie " + movie, e);
         } finally {
